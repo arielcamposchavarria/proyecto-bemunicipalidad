@@ -5,8 +5,10 @@ import { User } from '../User/user.entity';
 export class Concesion {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
   ArchivoAdjunto: string;
+  
   @ManyToOne(() => User, (user) => user.id)
   IdUser: User;
 }
