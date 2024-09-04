@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import {TypeOrmModule} from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './User/user.entity';
 import { Concesion } from './SolicitudConcesion/Concesion.entity';
 import { UserModule } from './User/user.module';
@@ -15,7 +15,6 @@ import { UserModule } from './User/user.module';
       database: 'zmtnp',
       entities: [User, Concesion],
       synchronize: true,
-
     }),
     UserModule,
     TypeOrmModule.forFeature([User, Concesion]),
