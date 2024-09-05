@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './User/user.entity';
 import { Concesion } from './SolicitudConcesion/Concesion.entity';
 import { UserModule } from './User/user.module';
+import { ConcesionesModule } from './SolicitudConcesion/Concesion.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './User/user.module';
       synchronize: true,
     }),
     UserModule,
+    ConcesionesModule,
     TypeOrmModule.forFeature([User, Concesion]),
   ],
 })
