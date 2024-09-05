@@ -8,7 +8,7 @@ export class Concesion {
 
   @Column()
   ArchivoAdjunto: string;
-  
+
   @ManyToOne(() => User, (user) => user.id)
   IdUser: User;
 }
