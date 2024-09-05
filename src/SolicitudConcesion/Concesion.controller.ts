@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -7,12 +8,18 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-
+import { ConcesionService } from './concesion.service';
+import { Concesion } from './Concesion.entity';
 @Controller('concesiones')
 export class ConcesionesController {
+constructor(private concesionService: ConcesionService){}
+
+@Get()
+  async getAllConcesiones(): Promise<Concesion[]> {
+    return await this.concesionService.getAllConcesiones();
+  }
 
 
-  
   @Post('upload')
 
   @UseInterceptors(
