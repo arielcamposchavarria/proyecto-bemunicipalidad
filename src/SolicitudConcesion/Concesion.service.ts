@@ -27,28 +27,29 @@ export class ConcesionService {
     return concesion;
   }
 
-  // Crear una nueva concesión
-  // Método para manejar el archivo subido y guardar su ruta en la base de datos
+  
   async createConcesion(
     concesionId: number,
     Filepath: string,
   ): Promise<Concesion> {
-    // Busca la concesión por ID
-    const concesion = await this.concesionRepository.findOneBy({
+   
+    let concesion = await this.concesionRepository.findOneBy({
       id: concesionId,
     });
 
     if (!concesion) {
-      throw new Error('Concesión no encontrada');
+
+      concesion = this.concesionRepository.create();
+    concesion.id = concesionId;
     }
 
-    // Asigna la ruta del archivo al campo archivoAdjunto
+    
     concesion.ArchivoAdjunto = Filepath;
 
-    // Guarda los cambios en la base de datos
+   
     return await this.concesionRepository.save(concesion);
   }
-  // Actualizar una concesión existente
+  
   async updateConcesion(
     id: number,
     updateData: Partial<Concesion>,
