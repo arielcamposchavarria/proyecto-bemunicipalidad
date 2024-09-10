@@ -20,7 +20,12 @@ export class ConcesionService {
 
   // Obtener todas las concesiones
   async getAllConcesiones(): Promise<Concesion[]> {
-    return await this.concesionRepository.find();
+
+    return this.concesionRepository
+      .createQueryBuilder('concesion')
+      .leftJoinAndSelect('concesion.IdUser', 'user') // Hacer un left join con la entidad User
+      .select(['concesion', 'user.id']) // Seleccionar los campos deseados
+      .getMany();
   }
 
   // Obtener una concesión por ID
