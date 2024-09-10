@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Concesion } from './Concesion.entity';
 import { User } from '../User/user.entity';
 import { Repository } from 'typeorm';
@@ -27,47 +32,54 @@ export class ConcesionService {
     return concesion;
   }
 
-  
   async createConcesion(
     concesionId: number,
     Filepath: string,
   ): Promise<Concesion> {
-   
     let concesion = await this.concesionRepository.findOneBy({
       id: concesionId,
     });
 
     if (!concesion) {
-
       concesion = this.concesionRepository.create();
-    concesion.id = concesionId;
+      concesion.id = concesionId;
     }
 
-    
     concesion.ArchivoAdjunto = Filepath;
 
-   
     return await this.concesionRepository.save(concesion);
   }
-  
+
   async updateConcesion(
     id: number,
     updateData: Partial<Concesion>,
     userId?: number,
   ): Promise<Concesion> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const concesion = await this.getConcesionById(id);
+    // Verificar si la concesión existe
+    await this.getConcesionById(id); // Ya no guardamos esta concesión en una variable
 
+    // Si se provee userId, validar que el usuario exista
     if (userId) {
-      const user = await this.userRepository.findOneBy({ id: userId }); // Cambio aquí
+      const user = await this.userRepository.findOneBy({ id: userId });
       if (!user) {
         throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
       }
-      updateData.IdUser = user;
+      updateData.IdUser = user; // Actualizamos el campo relacionado si el userId es válido
     }
 
+    // Comprobar si hay datos para actualizar
+    if (!Object.keys(updateData).length) {
+      throw new HttpException(
+        'No hay datos para actualizar',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Realizar la actualización
     await this.concesionRepository.update(id, updateData);
-    return this.getConcesionById(id);
+
+    // Devolver la concesión actualizada
+    return this.getConcesionById(id); // Aquí obtenemos y devolvemos la concesión actualizada
   }
 
   // Eliminar una concesión por ID
