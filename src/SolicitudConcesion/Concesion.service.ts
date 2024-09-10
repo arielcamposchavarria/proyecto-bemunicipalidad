@@ -32,22 +32,9 @@ export class ConcesionService {
     return concesion;
   }
 
-  async createConcesion(
-    concesionId: number,
-    Filepath: string,
-  ): Promise<Concesion> {
-    let concesion = await this.concesionRepository.findOneBy({
-      id: concesionId,
-    });
-
-    if (!concesion) {
-      concesion = this.concesionRepository.create();
-      concesion.id = concesionId;
-    }
-
-    concesion.ArchivoAdjunto = Filepath;
-
-    return await this.concesionRepository.save(concesion);
+  async createConcesion(concesionData: Partial<Concesion>): Promise<Concesion> {
+    const newConcesion = this.concesionRepository.create(concesionData);
+    return await this.concesionRepository.save(newConcesion);
   }
 
   async updateConcesion(
