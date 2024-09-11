@@ -9,6 +9,9 @@ export class Concesion {
   @Column()
   ArchivoAdjunto: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  // Relación con la entidad User
+  @ManyToOne(() => User, (user) => user.concesiones, { eager: true }) // eager: true para cargar automáticamente
   IdUser: User;
+
+  // Relación con la entidad Estado
 }
