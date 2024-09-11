@@ -14,23 +14,23 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { ConcesionService } from './concesion.service';
-import { Concesion } from './Concesion.entity';
 import { User } from 'src/User/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Prorroga } from './Prorroga.entity';
+import { ProrrogaService } from './Prorroga.service';
 
-@Controller('concesiones')
-export class ConcesionesController {
+@Controller('Prorrogas')
+export class ProrrogasController {
   constructor(
-    private readonly concesionService: ConcesionService,
+    private readonly ProrrogaService: ProrrogaService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
 
   @Get()
-  async getAllConcesiones(): Promise<Concesion[]> {
-    return await this.concesionService.getAllConcesiones();
+  async getAllProrrogaes(): Promise<Prorroga[]> {
+    return await this.ProrrogaService.getAllProrrogas();
   }
 
   @Post()
@@ -65,34 +65,28 @@ export class ConcesionesController {
     if (!file) {
       throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
     }
-
     if (!userId) {
       throw new HttpException('User ID is required', HttpStatus.BAD_REQUEST);
     }
 
     // Encuentra al usuario en la base de datos usando el ID proporcionado
     const user = await this.userRepository.findOne({ where: { id: userId } });
-
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
     // Prepara los datos de la concesión usando la instancia de User
-    const concesionData: Partial<Concesion> = {
+    const ProrrogaData: Partial<Prorroga> = {
       id,
-      ArchivoAdjunto: file.path,
+      ArchivoProrroga: file.path,
       IdUser: user, // Asigna la instancia del usuario encontrado
     };
-
-    const updatedConcesion =
-      await this.concesionService.createConcesion(concesionData);
-
+    const updatedProrroga =
+      await this.ProrrogaService.createProrroga(ProrrogaData);
     return {
       message: 'Archivo subido exitosamente',
-      concesion: updatedConcesion,
+      Prorroga: updatedProrroga,
     };
   }
-
   catch(error) {
     throw new HttpException(
       error.message || 'Error uploading file',
@@ -120,7 +114,7 @@ export class ConcesionesController {
       },
     }),
   )
-  async updateConcesion(
+  async updateProrroga(
     @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File, // Capturamos el archivo PDF
     @Body('userId') userId: number, // Capturamos el userId si es necesario
@@ -142,15 +136,15 @@ export class ConcesionesController {
 
     try {
       // Actualizar la concesión con la ruta del archivo y el userId
-      const updatedConcesion = await this.concesionService.updateConcesion(
+      const updatedProrroga = await this.ProrrogaService.updateProrroga(
         id,
-        { ArchivoAdjunto: file.path }, // Actualizamos la ruta del archivo
+        { ArchivoProrroga: file.path }, // Actualizamos la ruta del archivo
         userId,
       );
 
       return {
         message: 'Concesión actualizada exitosamente',
-        concesion: updatedConcesion,
+        Prorroga: updatedProrroga,
       };
     } catch (error) {
       throw new HttpException(
@@ -161,6 +155,6 @@ export class ConcesionesController {
   }
   @Delete(':id')
   async deleteUser(@Param('id') id: number): Promise<void> {
-    await this.concesionService.deleteConcesion(id);
+    await this.ProrrogaService.deleteProrroga(id);
   }
 }
