@@ -8,9 +8,9 @@ async function bootstrap() {
   // Especificamos que estamos usando NestExpressApplication
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Habilitar CORS
+  // // Habilitar CORS
 
-  const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);
 
   app.enableCors();
 
@@ -20,7 +20,6 @@ async function bootstrap() {
   });
 
   await app.listen(3006);
-  await app.listen(3002);
 }
 
 bootstrap();

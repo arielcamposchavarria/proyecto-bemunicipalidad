@@ -7,14 +7,15 @@ import {
   HttpException,
   HttpStatus,
   Body,
-
+  Put,
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ConcesionService } from './concesion.service';
 import { Concesion } from './Concesion.entity';
-
 import { User } from 'src/User/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,29 +28,16 @@ export class ConcesionesController {
     private readonly userRepository: Repository<User>,
   ) {}
 
-@Controller('concesiones')
-export class ConcesionesController {
-  constructor(private readonly concesionService: ConcesionService) {}
-
-
   @Get()
   async getAllConcesiones(): Promise<Concesion[]> {
     return await this.concesionService.getAllConcesiones();
   }
-
 
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
         destination: './uploads',
-
-  @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads', // Asegúrate de que el directorio exista
-
         filename: (req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const fileExtName = extname(file.originalname);
@@ -64,21 +52,14 @@ export class ConcesionesController {
         }
       },
       limits: {
-
         fields: 5,
-
-        fields: 5, // Aumenta este número si esperas más campos adicionales
-
       },
     }),
   )
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
-
     @Body('userId') userId: number,
     @Body('id') id: number
-
-    @Body('userId') userId: number, // Captura el ID del usuario del cuerpo de la solicitud
   ) {
     if (!file) {
       throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
@@ -88,7 +69,6 @@ export class ConcesionesController {
       throw new HttpException('User ID is required', HttpStatus.BAD_REQUEST);
     }
   
-
     // Encuentra al usuario en la base de datos usando el ID proporcionado
     const user = await this.userRepository.findOne({ where: { id: userId } });
   
@@ -104,13 +84,6 @@ export class ConcesionesController {
     };
   
     const updatedConcesion = await this.concesionService.createConcesion(concesionData);
-
-    // Llama al servicio para manejar el archivo y guardar la ruta
-    const updatedConcesion = await this.concesionService.createConcesion(
-      userId,
-      file.path,
-    );
-
   
     return {
       message: 'Archivo subido exitosamente',
@@ -118,7 +91,6 @@ export class ConcesionesController {
     };
   }
   
-
   catch(error) {
     throw new HttpException(
       error.message || 'Error uploading file',
@@ -181,21 +153,12 @@ export class ConcesionesController {
     } catch (error) {
       throw new HttpException(
         error.message || 'Error al actualizar la concesión',
-
-     catch (error) {
-      throw new HttpException(
-        error.message || 'Error uploading file',
-
         error.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
-
   @Delete(':id')
   async deleteUser(@Param('id') id: number): Promise<void> {
     await this.concesionService.deleteConcesion(id);
   }
 }
-
-
-
