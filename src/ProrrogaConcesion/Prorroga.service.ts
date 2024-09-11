@@ -29,12 +29,16 @@ export class ProrrogaService {
   }
 
   // Obtener una concesión por ID
+  // async getProrrogaById(id: number): Promise<Prorroga> {
+  //   const Prorroga = await this.ProrrogaRepository.findOneBy({ id }); // Cambio aquí
+  //   if (!Prorroga) {
+  //     throw new NotFoundException(`Concesión con ID ${id} no encontrada`);
+  //   }
+  //   return Prorroga;
+  // }
+
   async getProrrogaById(id: number): Promise<Prorroga> {
-    const Prorroga = await this.ProrrogaRepository.findOneBy({ id }); // Cambio aquí
-    if (!Prorroga) {
-      throw new NotFoundException(`Concesión con ID ${id} no encontrada`);
-    }
-    return Prorroga;
+    return await this.ProrrogaRepository.findOne({ where: { id } });
   }
 
   async createProrroga(ProrrogaData: Partial<Prorroga>): Promise<Prorroga> {

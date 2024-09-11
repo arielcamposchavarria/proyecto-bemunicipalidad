@@ -8,6 +8,8 @@ import { UserModule } from './User/user.module';
 import { ConcesionesModule } from './SolicitudConcesion/Concesion.module';
 import { Prorroga } from './ProrrogaConcesion/Prorroga.entity';
 import { ProrrogaModule } from './ProrrogaConcesion/Prorroga.module';
+import { CitasModule } from './Citas/Citas.module';
+import { Cita } from './Citas/Citas.entity';
 
 @Module({
   imports: [
@@ -18,17 +20,19 @@ import { ProrrogaModule } from './ProrrogaConcesion/Prorroga.module';
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
-      port: 3306,
+      port: 3307,
       username: 'root',
       password: '1234',
       database: 'zmtnp',
-      entities: [User, Concesion, Prorroga],
+      entities: [User, Concesion, Prorroga, Cita],
       synchronize: true,
     }),
     UserModule,
     ConcesionesModule,
     ProrrogaModule,
-    TypeOrmModule.forFeature([User, Concesion, Prorroga]),
+     CitasModule,
+     TypeOrmModule.forFeature([User, Concesion, Prorroga, Cita]),
+   
   ],
 })
 export class AppModule {}
