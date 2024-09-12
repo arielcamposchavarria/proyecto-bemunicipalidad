@@ -44,7 +44,7 @@ import {
     async createCita(
       @Body('descripcion') descripcion: string,
       @Body('userId') userId: number,
-      @Body('Fecha') Fecha: Date, // Recibe la fecha desde el cuerpo de la solicitud
+      @Body('fecha') fecha: Date, // Recibe la fecha desde el cuerpo de la solicitud
     ): Promise<Cita> {
       // Buscar el usuario por su ID
       const user = await this.userRepository.findOne({ where: { id: userId } });
@@ -53,9 +53,15 @@ import {
       }
   
       // Preparar los datos de la cita
+      const citaFecha = new Date(fecha);
+      if (isNaN(citaFecha.getTime())) {
+        throw new HttpException('Fecha inválida', HttpStatus.BAD_REQUEST);
+      }
+    
+      // Preparar los datos de la cita
       const citaData: Partial<Cita> = {
         descripcion,
-        fecha: new Date(Fecha), // Convertimos la fecha a un objeto Date
+        fecha: citaFecha, // Utiliza la fecha convertida
         IdUser: user,
       };
   

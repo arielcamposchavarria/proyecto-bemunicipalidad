@@ -21,7 +21,7 @@ export class User {
   @Column({ type: 'bigint', nullable: true }) // Puede permitir `null` en el número de teléfono, usando bigint para números largos
   telefono: number;
   
-  @Column({ unique: true, length: 100 }) // Email debe ser único y se limita a 100 caracteres
+  @Column({length: 100 }) // Email debe ser único y se limita a 100 caracteres
   email: string;
 
   @Column() // La contraseña debería encriptarse en la aplicación antes de guardarse
