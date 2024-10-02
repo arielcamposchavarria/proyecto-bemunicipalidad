@@ -10,8 +10,9 @@ import {
   Put,
   Param,
   Delete,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { User } from 'src/User/user.entity';
@@ -28,14 +29,46 @@ export class ProrrogasController {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  
   @Get()
   async getAllProrrogaes(): Promise<Prorroga[]> {
     return await this.ProrrogaService.getAllProrrogas();
   }
 
+  @Get(':id/archivo')
+  async obtenerArchivosProrroga(@Param('id') id: number) {
+    try {
+      // Llamar al servicio para obtener la prórroga por ID
+      const prorroga = await this.ProrrogaService.getProrrogaById(id);
+
+      // Verificar si la prórroga existe
+      if (!prorroga) {
+        throw new HttpException('Prórroga no encontrada', HttpStatus.NOT_FOUND);
+      }
+
+      // Extraer los archivos adjuntos (campo ArchivoProrroga almacenado como JSON)
+      const archivosAdjuntos = JSON.parse(prorroga.ArchivoProrroga || '[]');
+
+      // Verificar si existen archivos
+      if (!archivosAdjuntos.length) {
+        throw new HttpException('No hay archivos adjuntos', HttpStatus.NOT_FOUND);
+      }
+
+      // Devolver los archivos adjuntos
+      return { archivosAdjuntos };
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Error al obtener los archivos adjuntos',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+  
   @Post()
   @UseInterceptors(
-    FileInterceptor('file', {
+    FilesInterceptor('files', 5, { // Cambiamos a FilesInterceptor, permitiendo hasta 5 archivos
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -53,17 +86,17 @@ export class ProrrogasController {
         }
       },
       limits: {
-        fields: 5,
+        files: 5, // Limitar a 5 archivos
       },
     }),
   )
-  async uploadFile(
-    @UploadedFile() file: Express.Multer.File,
+  async uploadFiles(
+    @UploadedFiles() files: Array<Express.Multer.File>, // Cambiado a @UploadedFiles
     @Body('userId') userId: number,
     @Body('id') id: number,
   ) {
-    if (!file) {
-      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+    if (!files || files.length === 0) {
+      throw new HttpException('No files uploaded', HttpStatus.BAD_REQUEST);
     }
     if (!userId) {
       throw new HttpException('User ID is required', HttpStatus.BAD_REQUEST);
@@ -74,12 +107,15 @@ export class ProrrogasController {
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-    // Prepara los datos de la concesión usando la instancia de User
+
+    const prorrogaFiles = files.map(file => file.path); // Solo obtenemos los paths
+
     const ProrrogaData: Partial<Prorroga> = {
       id,
-      ArchivoProrroga: file.path,
-      IdUser: user, // Asigna la instancia del usuario encontrado
+      ArchivoProrroga: JSON.stringify(prorrogaFiles), // Guardamos los paths en formato JSON
+      IdUser: user,
     };
+    
     const updatedProrroga =
       await this.ProrrogaService.createProrroga(ProrrogaData);
     return {
