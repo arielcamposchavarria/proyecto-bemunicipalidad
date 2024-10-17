@@ -18,7 +18,7 @@ import { Cita } from './Citas/Citas.entity';
       serveRoot: '/uploads/', // Configuración para servir archivos estáticos desde la carpeta "uploads"
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: 'dpg-cs8itklumphs7388hui0-a',
       port: 5432,
       username: 'municipalidadsql_user',
