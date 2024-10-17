@@ -6,7 +6,7 @@ export class Concesion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column("text")
   ArchivoAdjunto: string;
 
   // Relación con la entidad User

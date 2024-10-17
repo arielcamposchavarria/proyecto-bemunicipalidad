@@ -23,7 +23,7 @@ import { Cita } from './Citas/Citas.entity';
       port: 3306,
       username: 'root',
       password: '1234',
-      database: 'zmtnp',
+      database: 'pruebaszmn',
       entities: [User, Concesion, Prorroga, Cita],
       synchronize: true,
     }),

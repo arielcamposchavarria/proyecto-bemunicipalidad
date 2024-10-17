@@ -11,7 +11,9 @@ async function bootstrap() {
 
   // const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:5173', // O el puerto donde corre tu frontend
+  });
 
   // Servir archivos estáticos desde la carpeta 'uploads'
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {

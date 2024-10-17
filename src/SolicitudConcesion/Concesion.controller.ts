@@ -10,8 +10,9 @@ import {
   Put,
   Param,
   Delete,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ConcesionService } from './concesion.service';
@@ -19,6 +20,7 @@ import { Concesion } from './Concesion.entity';
 import { User } from 'src/User/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { existsSync, mkdirSync } from 'fs';
 
 @Controller('concesiones')
 export class ConcesionesController {
@@ -35,7 +37,7 @@ export class ConcesionesController {
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('file', {
+    FilesInterceptor('file',3, {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -58,50 +60,53 @@ export class ConcesionesController {
     }),
   )
   async uploadFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],  // Cambiado a un array de archivos
     @Body('userId') userId: number,
     @Body('id') id: number,
   ) {
-    if (!file) {
-      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+    if (!files || files.length === 0) {
+      throw new HttpException('No files uploaded', HttpStatus.BAD_REQUEST);
     }
-
+  
     if (!userId) {
       throw new HttpException('User ID is required', HttpStatus.BAD_REQUEST);
     }
-
+  
     // Encuentra al usuario en la base de datos usando el ID proporcionado
     const user = await this.userRepository.findOne({ where: { id: userId } });
-
+  
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
-
+  
     // Prepara los datos de la concesión usando la instancia de User
-    const concesionData: Partial<Concesion> = {
-      id,
-      ArchivoAdjunto: file.path,
-      IdUser: user, // Asigna la instancia del usuario encontrado
-    };
+    const archivosAdjuntos = files.map(file => file.path).join(',');
 
-    const updatedConcesion =
-      await this.concesionService.createConcesion(concesionData);
+  // Prepara los datos de la concesión usando la instancia de User
+  const concesionData: Partial<Concesion> = {
+    id,
+    ArchivoAdjunto: archivosAdjuntos, // Guarda las rutas de los archivos como cadena
+    IdUser: user,
+  };
 
-    return {
-      message: 'Archivo subido exitosamente',
-      concesion: updatedConcesion,
-    };
-  }
+  const updatedConcesion =
+    await this.concesionService.createConcesion(concesionData);
 
+  return {
+    message: 'Archivos subidos exitosamente',
+    concesion: updatedConcesion,
+  };
+}
+  
   catch(error) {
     throw new HttpException(
-      error.message || 'Error uploading file',
+      error.message || 'Error uploading files',
       error.status || HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
-  @Put(':id')
+  /*@Put(':id')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FilesInterceptor('file', 3,{
       storage: diskStorage({
         destination: './uploads', // Asegúrate de que el directorio existe
         filename: (req, file, cb) => {
@@ -158,7 +163,7 @@ export class ConcesionesController {
         error.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
+  }*/
   @Delete(':id')
   async deleteUser(@Param('id') id: number): Promise<void> {
     await this.concesionService.deleteConcesion(id);
