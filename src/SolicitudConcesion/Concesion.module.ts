@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConcesionesController } from './concesion.controller';
-import { ConcesionService } from './concesion.service';
+import { ConcesionesController } from './Concesion.controller';
+import { ConcesionService } from './Concesion.service';
 import { Concesion } from './Concesion.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from 'src/User/user.module';

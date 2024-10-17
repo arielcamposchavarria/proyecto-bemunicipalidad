@@ -13,7 +13,7 @@ import {
   import { Repository } from 'typeorm';
   import { Cita } from '../Citas/Citas.entity';
   import { User } from '../User/user.entity';
-  import { CitasService } from './citas.service';
+  import { CitasService } from './Citas.service';
   
   @Controller('citas')
   export class CitasController {
