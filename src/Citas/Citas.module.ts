@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CitasController } from './citas.controller';
-import { CitasService } from './citas.service';
+import { CitasController } from './Citas.controller';
+import { CitasService } from './Citas.service';
 import { Cita } from '../Citas/Citas.entity';
 import { User } from '../User/user.entity';
 
